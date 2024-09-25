@@ -1,5 +1,5 @@
 import datetime
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from main.forms import MoodEntryForm
 from main.models import MoodEntry
 from django.http import HttpResponse, HttpResponseRedirect
@@ -35,6 +35,23 @@ def create_mood_entry(request):
 
     context = {'form': form}
     return render(request, "create_mood_entry.html", context)
+
+def edit_mood(request, id):
+    mood = MoodEntry.objects.get(pk = id)
+
+    form = MoodEntryForm(request.POST or None, instance=mood)
+
+    if form.is_valid() and request.method == "POST":
+        form.save()
+        return HttpResponseRedirect(reverse('main:show_main'))
+
+    context = {'form': form}
+    return render(request, "edit_mood.html", context)
+
+def delete_mood(request, id):
+    mood = MoodEntry.objects.get(pk = id)
+    mood.delete()
+    return HttpResponseRedirect(reverse('main:show_main'))
 
 def register(request):
     form = UserCreationForm()
